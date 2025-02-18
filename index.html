@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VIP ক্যালকুলেটর ওয়েবসাইট</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #4a69bd;
+      --secondary-color: #3b5998;
+      --bg-color: #f0f4ff;
+      --text-color: #333;
+      --card-bg: #fff;
+      --btn-hover: #3b5a99;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      transition: background 0.5s, color 0.5s;
+    }
+    /* Dark Mode Variables */
+    body.dark-mode {
+      --bg-color: #1d1f21;
+      --text-color: #c5c6c7;
+      --card-bg: #2e2f31;
+      --primary-color: #3c6382;
+      --secondary-color: #2f4f6f;
+      --btn-hover: #1b2d3c;
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+    header {
+      background: var(--primary-color);
+      color: #fff;
+      text-align: center;
+      padding: 20px 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      animation: slideDown 1s ease-out;
+    }
+    header p {
+      margin: 5px 0 0;
+      font-size: 1rem;
+      animation: fadeIn 1.5s ease-out;
+    }
+    /* Dark mode toggle switch */
+    .toggle-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+      margin-left: 8px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0;
+      right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    /* Responsive Nav (Carousel-Style) */
+    nav {
+      display: flex;
+      overflow-x: auto;
+      white-space: nowrap;
+      background: var(--secondary-color);
+      transition: background 0.5s;
+    }
+    nav button {
+      flex: 0 0 auto;
+      background: none;
+      border: none;
+      color: #fff;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s, transform 0.3s;
+    }
+    nav button:hover {
+      background: var(--btn-hover);
+      transform: scale(1.05);
+    }
+    .container {
+      max-width: 960px;
+      margin: 20px auto;
+      padding: 10px;
+      animation: fadeIn 1s ease-out;
+    }
+    .section {
+      background: var(--card-bg);
+      margin-bottom: 30px;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      display: none;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.5s forwards;
+    }
+    .section.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    h2 {
+      margin-top: 0;
+      color: var(--primary-color);
+      animation: fadeIn 1s ease-out;
+    }
+    .input-field {
+      margin-bottom: 15px;
+    }
+    .input-field label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    .input-field input, .input-field select {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+      background: var(--card-bg);
+      color: var(--text-color);
+    }
+    .input-field input:focus, .input-field select:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+    button.calculate-btn {
+      background: var(--primary-color);
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background 0.3s, transform 0.3s;
+    }
+    button.calculate-btn:hover {
+      background: var(--btn-hover);
+      transform: scale(1.03);
+    }
+    .result {
+      margin-top: 10px;
+      font-weight: 600;
+      color: var(--text-color);
+      min-height: 30px;
+    }
+    /* Common Calculator Display Styles */
+    .calc-container {
+      margin-bottom: 15px;
+    }
+    .calc-display {
+      width: 100%;
+      height: 50px;
+      font-size: 20px;
+      text-align: right;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      background: var(--card-bg);
+      color: var(--text-color);
+    }
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .calc-grid button {
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      background: #e1e8f0;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .calc-grid button:hover {
+      background: #d0d8e0;
+      transform: scale(1.05);
+    }
+    /* Scientific Calculator Specific (uses 6 columns) */
+    .sci-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+    .sci-equal-btn {
+      margin-top: 10px;
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      background: var(--primary-color);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .sci-equal-btn:hover {
+      background: var(--btn-hover);
+      transform: scale(1.03);
+    }
+    /* Back to Top Button */
+    #backToTop {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--primary-color);
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      transition: transform 0.3s;
+      z-index: 1000;
+    }
+    #backToTop:hover {
+      transform: scale(1.1);
+    }
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-100%); }
+      to { transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 style="margin-top: 20px;">VIP ক্যালকুলেটরসমূহ </h1>
+    <p>বিভিন্ন প্রিমিয়াম ক্যালকুলেটরের একদম ফ্রী </p>
+    <div class="toggle-container">
+      Dark Mode
+      <label class="switch">
+        <input type="checkbox" id="darkModeToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </header>
+  
+  <nav>
+    <button onclick="showSection('bmi')">BMI</button>
+    <button onclick="showSection('basic')">Basic</button>
+    <button onclick="showSection('interest')">Interest</button>
+    <button onclick="showSection('currency')">Currency</button>
+    <button onclick="showSection('temperature')">Temp</button>
+    <button onclick="showSection('dateCalc')">Date</button>
+    <button onclick="showSection('scientific')">Scientific</button>
+    <button onclick="showSection('emi')">EMI</button>
+    <button onclick="showSection('tip')">Tip</button>
+    <button onclick="showSection('length')">Length</button>
+  </nav>
+  
+  <div class="container">
+    <!-- 1. BMI Calculator -->
+    <div id="bmi" class="section active">
+      <h2>BMI Calculator</h2>
+      <div class="calc-container">
+        <input type="number" id="weight" class="calc-display" placeholder="ওজন (কেজি)" />
+      </div>
+      <div class="input-field">
+        <label for="height">উচ্চতা:</label>
+        <input type="number" step="0.01" id="height" placeholder="উচ্চতা লিখুন" />
+        <select id="heightUnit">
+          <option value="m">মিটার</option>
+          <option value="cm">সেমি</option>
+          <option value="inch">ইঞ্চি</option>
+          <option value="ft">ফুট</option>
+        </select>
+      </div>
+      <button class="calculate-btn" onclick="calculateBMI()">Calculate BMI</button>
+      <div id="bmiResult" class="result"></div>
+    </div>
+    
+    <!-- 2. Basic Calculator (Simple Grid Interface) -->
+    <div id="basic" class="section">
+      <h2>Basic Calculator</h2>
+      <div class="calc-container">
+        <input type="text" id="basicDisplay" class="calc-display" placeholder="0" readonly>
+      </div>
+      <div class="calc-grid">
+        <button onclick="basicClear()">C</button>
+        <button onclick="basicDelete()">DEL</button>
+        <button onclick="appendToBasic('%')">%</button>
+        <button onclick="appendToBasic('/')">/</button>
+        <button onclick="appendToBasic('7')">7</button>
+        <button onclick="appendToBasic('8')">8</button>
+        <button onclick="appendToBasic('9')">9</button>
+        <button onclick="appendToBasic('*')">*</button>
+        <button onclick="appendToBasic('4')">4</button>
+        <button onclick="appendToBasic('5')">5</button>
+        <button onclick="appendToBasic('6')">6</button>
+        <button onclick="appendToBasic('-')">-</button>
+        <button onclick="appendToBasic('1')">1</button>
+        <button onclick="appendToBasic('2')">2</button>
+        <button onclick="appendToBasic('3')">3</button>
+        <button onclick="appendToBasic('+')">+</button>
+        <button onclick="appendToBasic('0')">0</button>
+        <button onclick="appendToBasic('.')">.</button>
+        <button onclick="calculateBasic()">=</button>
+      </div>
+      <div id="basicResult" class="result"></div>
+    </div>
+    
+    <!-- 3. Simple Interest Calculator -->
+    <div id="interest" class="section">
+      <h2>Simple Interest Calculator</h2>
+      <div class="calc-container">
+        <input type="number" id="principal" class="calc-display" placeholder="মূলধন (টাকা)" />
+      </div>
+      <div class="input-field">
+        <label for="rate">ব্যাজ হার (%):</label>
+        <input type="number" step="0.01" id="rate" placeholder="ব্যাজ হার লিখুন">
+      </div>
+      <div class="input-field">
+        <label for="time">সময় (বছর):</label>
+        <input type="number" id="time" placeholder="সময় লিখুন">
+      </div>
+      <button class="calculate-btn" onclick="calculateInterest()">Calculate Interest</button>
+      <div id="interestResult" class="result"></div>
+    </div>
+    
+    <!-- 4. Currency Converter -->
+    <div id="currency" class="section">
+      <h2>Currency Converter</h2>
+      <div class="calc-container">
+        <input type="number" id="amount" class="calc-display" placeholder="টাকার পরিমাণ">
+      </div>
+      <div class="input-field">
+        <label for="fromCurrency">থেকে:</label>
+        <select id="fromCurrency">
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+          <option value="BDT">BDT</option>
+          <option value="INR">INR</option>
+          <option value="GBP">GBP</option>
+          <option value="AUD">AUD</option>
+          <option value="CAD">CAD</option>
+          <option value="JPY">JPY</option>
+          <option value="CNY">CNY</option>
+        </select>
+      </div>
+      <div class="input-field">
+        <label for="toCurrency">তে:</label>
+        <select id="toCurrency">
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+          <option value="BDT">BDT</option>
+          <option value="INR">INR</option>
+          <option value="GBP">GBP</option>
+          <option value="AUD">AUD</option>
+          <option value="CAD">CAD</option>
+          <option value="JPY">JPY</option>
+          <option value="CNY">CNY</option>
+        </select>
+      </div>
+      <button class="calculate-btn" onclick="convertCurrency()">Convert Currency</button>
+      <div id="currencyResult" class="result"></div>
+    </div>
+    
+    <!-- 5. Temperature Converter -->
+    <div id="temperature" class="section">
+      <h2>Temperature Converter</h2>
+      <div class="calc-container">
+        <input type="number" id="tempValue" class="calc-display" placeholder="তাপমাত্রা">
+      </div>
+      <div class="input-field">
+        <label for="tempFrom">থেকে:</label>
+        <select id="tempFrom">
+          <option value="C">Celsius (°C)</option>
+          <option value="F">Fahrenheit (°F)</option>
+          <option value="K">Kelvin (K)</option>
+        </select>
+      </div>
+      <div class="input-field">
+        <label for="tempTo">তে:</label>
+        <select id="tempTo">
+          <option value="C">Celsius (°C)</option>
+          <option value="F">Fahrenheit (°F)</option>
+          <option value="K">Kelvin (K)</option>
+        </select>
+      </div>
+      <button class="calculate-btn" onclick="convertTemperature()">Convert Temperature</button>
+      <div id="tempResult" class="result"></div>
+    </div>
+    
+    <!-- 6. Date Difference Calculator -->
+    <div id="dateCalc" class="section">
+      <h2>Date Difference Calculator</h2>
+      <div class="input-field">
+        <label for="startDate">শুরুর তারিখ:</label>
+        <input type="date" id="startDate">
+      </div>
+      <div class="input-field">
+        <label for="endDate">শেষের তারিখ:</label>
+        <input type="date" id="endDate">
+      </div>
+      <button class="calculate-btn" onclick="calculateDateDiff()">Calculate Difference</button>
+      <div id="dateResult" class="result"></div>
+    </div>
+    
+    <!-- 7. Scientific Calculator -->
+    <div id="scientific" class="section">
+      <h2>Scientific Calculator</h2>
+      <div class="calc-container">
+        <input type="text" id="sciDisplay" class="calc-display" placeholder="0" readonly>
+      </div>
+      <div class="sci-grid">
+        <!-- Row 1 -->
+        <button onclick="sciClear()">C</button>
+        <button onclick="sciDelete()">DEL</button>
+        <button onclick="appendToSci('(')"> ( </button>
+        <button onclick="appendToSci(')')"> ) </button>
+        <button onclick="appendToSci('/')">÷</button>
+        <button onclick="appendToSci('%')">%</button>
+        <!-- Row 2 -->
+        <button onclick="appendToSci('7')">7</button>
+        <button onclick="appendToSci('8')">8</button>
+        <button onclick="appendToSci('9')">9</button>
+        <button onclick="appendToSci('*')">×</button>
+        <button onclick="appendToSci('**2')">x²</button>
+        <button onclick="appendToSci('√(')">√</button>
+        <!-- Row 3 -->
+        <button onclick="appendToSci('4')">4</button>
+        <button onclick="appendToSci('5')">5</button>
+        <button onclick="appendToSci('6')">6</button>
+        <button onclick="appendToSci('-')">−</button>
+        <button onclick="appendToSci('sin(')">sin</button>
+        <button onclick="appendToSci('cos(')">cos</button>
+        <!-- Row 4 -->
+        <button onclick="appendToSci('1')">1</button>
+        <button onclick="appendToSci('2')">2</button>
+        <button onclick="appendToSci('3')">3</button>
+        <button onclick="appendToSci('+')">+</button>
+        <button onclick="appendToSci('tan(')">tan</button>
+        <button onclick="appendToSci('log(')">log</button>
+        <!-- Row 5 -->
+        <button onclick="appendToSci('0')">0</button>
+        <button onclick="appendToSci('.')">.</button>
+        <button onclick="appendToSci('π')">π</button>
+        <button onclick="appendToSci('e')">e</button>
+        <button onclick="appendToSci('mod')">mod</button>
+        <button onclick="appendToSci('ANS')">ANS</button>
+      </div>
+      <button class="sci-equal-btn" onclick="evaluateSci()">=</button>
+    </div>
+    
+    <!-- 8. EMI Calculator -->
+    <div id="emi" class="section">
+      <h2>EMI Calculator</h2>
+      <div class="calc-container">
+        <input type="number" id="loanAmount" class="calc-display" placeholder="লোনের পরিমাণ (টাকা)">
+      </div>
+      <div class="input-field">
+        <label for="annualRate">বার্ষিক সুদের হার (%):</label>
+        <input type="number" step="0.01" id="annualRate" placeholder="সুদের হার লিখুন">
+      </div>
+      <div class="input-field">
+        <label for="loanTenure">সুদের সময়কাল (বছর):</label>
+        <input type="number" id="loanTenure" placeholder="সময় লিখুন">
+      </div>
+      <button class="calculate-btn" onclick="calculateEMI()">Calculate EMI</button>
+      <div id="emiResult" class="result"></div>
+    </div>
+    
+    <!-- 9. Tip Calculator (Split Bill) -->
+    <div id="tip" class="section">
+      <h2>Tip Calculator</h2>
+      <div class="calc-container">
+        <input type="number" id="billAmount" class="calc-display" placeholder="বিলের পরিমাণ (টাকা)">
+      </div>
+      <div class="input-field">
+        <label for="tipPercent">টিপ (%) :</label>
+        <input type="number" id="tipPercent" placeholder="টিপের শতাংশ লিখুন">
+      </div>
+      <div class="input-field">
+        <label for="numPersons">কত জন ভাগ করছেন:</label>
+        <input type="number" id="numPersons" placeholder="জন সংখ্যা লিখুন">
+      </div>
+      <button class="calculate-btn" onclick="calculateTip()">Calculate Tip</button>
+      <div id="tipResult" class="result"></div>
+    </div>
+    
+    <!-- 10. Length Converter -->
+    <div id="length" class="section">
+      <h2>Length Converter</h2>
+      <div class="calc-container">
+        <input type="number" id="lengthValue" class="calc-display" placeholder="দৈর্ঘ্য মান">
+      </div>
+      <div class="input-field">
+        <label for="lengthFrom">থেকে:</label>
+        <select id="lengthFrom">
+          <option value="km">কিলোমিটার</option>
+          <option value="m">মিটার</option>
+          <option value="cm">সেমি</option>
+          <option value="mile">মাইল</option>
+          <option value="yard">ইয়ার্ড</option>
+        </select>
+      </div>
+      <div class="input-field">
+        <label for="lengthTo">তে:</label>
+        <select id="lengthTo">
+          <option value="km">কিলোমিটার</option>
+          <option value="m">মিটার</option>
+          <option value="cm">সেমি</option>
+          <option value="mile">মাইল</option>
+          <option value="yard">ইয়ার্ড</option>
+        </select>
+      </div>
+      <button class="calculate-btn" onclick="convertLength()">Convert Length</button>
+      <div id="lengthResult" class="result"></div>
+    </div>
+  </div>
+  
+  <!-- Back to Top Button -->
+  <button id="backToTop" onclick="scrollToTop()">↑</button>
+  
+  <script>
+    // Show selected section smoothly
+    function showSection(sectionId) {
+      const sections = document.querySelectorAll('.section');
+      sections.forEach(section => section.classList.remove('active'));
+      const activeSection = document.getElementById(sectionId);
+      activeSection.classList.add('active');
+      activeSection.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    /* ----------------- BMI Calculator ----------------- */
+    function calculateBMI() {
+      const weight = parseFloat(document.getElementById('weight').value);
+      const heightInput = parseFloat(document.getElementById('height').value);
+      const heightUnit = document.getElementById('heightUnit').value;
+      const resultDiv = document.getElementById('bmiResult');
+      
+      if (isNaN(weight) || weight <= 0 || isNaN(heightInput) || heightInput <= 0) {
+        resultDiv.innerHTML = "দয়া করে সঠিক ওজন ও উচ্চতার মান লিখুন।";
+        return;
+      }
+      
+      let heightInMeters;
+      switch(heightUnit) {
+        case 'm': heightInMeters = heightInput; break;
+        case 'cm': heightInMeters = heightInput / 100; break;
+        case 'inch': heightInMeters = heightInput * 0.0254; break;
+        case 'ft': heightInMeters = heightInput * 0.3048; break;
+        default: heightInMeters = heightInput;
+      }
+      
+      let bmi = weight / (heightInMeters * heightInMeters);
+      bmi = bmi.toFixed(2);
+      let status = "", advice = "";
+      if(bmi < 18.5) {
+        status = "Underweight";
+        advice = "আপনি পাতলা। পুষ্টিকর খাবার খান ও ওজন বাড়ান।";
+      } else if(bmi >= 18.5 && bmi < 25) {
+        status = "Normal";
+        advice = "আপনার ওজন স্বাভাবিক। নিয়মিত ব্যায়াম করুন।";
+      } else if(bmi >= 25 && bmi < 30) {
+        status = "Overweight";
+        advice = "আপনি অতিরিক্ত ওজনের শিকার। খাদ্যাভ্যাস পরিবর্তন করুন।";
+      } else {
+        status = "Obese";
+        advice = "আপনার ওজন অনেক বেশি। স্বাস্থ্য বিশেষজ্ঞের পরামর্শ নিন।";
+      }
+      resultDiv.innerHTML = `আপনার BMI: ${bmi} (${status})<br>${advice}`;
+    }
+    
+    /* ----------------- Basic Calculator ----------------- */
+    function appendToBasic(val) {
+      document.getElementById('basicDisplay').value += val;
+    }
+    function basicClear() {
+      document.getElementById('basicDisplay').value = "";
+      document.getElementById('basicResult').innerHTML = "";
+    }
+    function basicDelete() {
+      const disp = document.getElementById('basicDisplay');
+      disp.value = disp.value.slice(0, -1);
+    }
+    function calculateBasic() {
+      const expr = document.getElementById('basicDisplay').value;
+      try {
+        const result = eval(expr);
+        document.getElementById('basicResult').innerHTML = "ফলাফল: " + result;
+        document.getElementById('basicDisplay').value = result;
+      } catch (e) {
+        document.getElementById('basicResult').innerHTML = "Error";
+      }
+    }
+    
+    /* ----------------- Simple Interest Calculator ----------------- */
+    function calculateInterest() {
+      const principal = parseFloat(document.getElementById('principal').value);
+      const rate = parseFloat(document.getElementById('rate').value);
+      const time = parseFloat(document.getElementById('time').value);
+      const resultDiv = document.getElementById('interestResult');
+      
+      if(isNaN(principal) || isNaN(rate) || isNaN(time) || principal<=0 || rate<=0 || time<=0) {
+        resultDiv.innerHTML = "দয়া করে সঠিক মান লিখুন।";
+        return;
+      }
+      const interest = (principal * rate * time) / 100;
+      resultDiv.innerHTML = "সরাসরি সুদ: " + interest.toFixed(2) + " টাকা";
+    }
+    
+    /* ----------------- Currency Converter ----------------- */
+    const currencyRates = {
+      "USD": 1,
+      "EUR": 0.9,
+      "BDT": 105,
+      "INR": 80,
+      "GBP": 0.8,
+      "AUD": 1.4,
+      "CAD": 1.3,
+      "JPY": 115,
+      "CNY": 6.5
+    };
+    function convertCurrency() {
+      const amount = parseFloat(document.getElementById('amount').value);
+      const from = document.getElementById('fromCurrency').value;
+      const to = document.getElementById('toCurrency').value;
+      const resultDiv = document.getElementById('currencyResult');
+      
+      if(isNaN(amount) || amount <= 0) {
+        resultDiv.innerHTML = "দয়া করে সঠিক টাকার পরিমাণ লিখুন।";
+        return;
+      }
+      // Convert amount to USD, then to target currency
+      const amountInUSD = amount / currencyRates[from];
+      const converted = amountInUSD * currencyRates[to];
+      resultDiv.innerHTML = `${amount} ${from} = ${converted.toFixed(2)} ${to}`;
+    }
+    
+    /* ----------------- Temperature Converter ----------------- */
+    function convertTemperature() {
+      const value = parseFloat(document.getElementById('tempValue').value);
+      const from = document.getElementById('tempFrom').value;
+      const to = document.getElementById('tempTo').value;
+      const resultDiv = document.getElementById('tempResult');
+      
+      if(isNaN(value)) {
+        resultDiv.innerHTML = "দয়া করে সঠিক তাপমাত্রা লিখুন।";
+        return;
+      }
+      let result;
+      let tempInC;
+      if(from === "C") {
+        tempInC = value;
+      } else if(from === "F") {
+        tempInC = (value - 32) * 5/9;
+      } else if(from === "K") {
+        tempInC = value - 273.15;
+      }
+      if(to === "C") {
+        result = tempInC;
+      } else if(to === "F") {
+        result = (tempInC * 9/5) + 32;
+      } else if(to === "K") {
+        result = tempInC + 273.15;
+      }
+      resultDiv.innerHTML = `ফলাফল: ${result.toFixed(2)} ${to}`;
+    }
+    
+    /* ----------------- Date Difference Calculator ----------------- */
+    function calculateDateDiff() {
+      const start = new Date(document.getElementById('startDate').value);
+      const end = new Date(document.getElementById('endDate').value);
+      const resultDiv = document.getElementById('dateResult');
+      
+      if(isNaN(start) || isNaN(end)) {
+        resultDiv.innerHTML = "দয়া করে সঠিক তারিখ নির্বাচন করুন।";
+        return;
+      }
+      const diffTime = Math.abs(end - start);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      resultDiv.innerHTML = `দুই তারিখের মধ্যে ${diffDays} দিন পার্থক্য রয়েছে।`;
+    }
+    
+    /* ----------------- Scientific Calculator ----------------- */
+    let ans = 0; // Global answer variable for ANS
+    function appendToSci(value) {
+      const display = document.getElementById('sciDisplay');
+      if(value === "ANS") {
+        display.value += ans;
+      } else {
+        display.value += value;
+      }
+    }
+    function sciClear() {
+      document.getElementById('sciDisplay').value = "";
+    }
+    function sciDelete() {
+      const display = document.getElementById('sciDisplay');
+      display.value = display.value.slice(0, -1);
+    }
+    function evaluateSci() {
+      let expr = document.getElementById('sciDisplay').value;
+      expr = expr.replace(/π/g, "Math.PI")
+                 .replace(/√\(/g, "Math.sqrt(")
+                 .replace(/sin\(/g, "Math.sin(")
+                 .replace(/cos\(/g, "Math.cos(")
+                 .replace(/tan\(/g, "Math.tan(")
+                 .replace(/log\(/g, "Math.log(");
+      try {
+        const result = eval(expr);
+        document.getElementById('sciDisplay').value = result;
+        ans = result;
+      } catch (e) {
+        document.getElementById('sciDisplay').value = "Error";
+      }
+    }
+    
+    /* ----------------- EMI Calculator ----------------- */
+    function calculateEMI() {
+      const principal = parseFloat(document.getElementById('loanAmount').value);
+      const annualRate = parseFloat(document.getElementById('annualRate').value);
+      const tenure = parseFloat(document.getElementById('loanTenure').value);
+      const resultDiv = document.getElementById('emiResult');
+      
+      if(isNaN(principal) || isNaN(annualRate) || isNaN(tenure) || principal<=0 || annualRate<=0 || tenure<=0) {
+        resultDiv.innerHTML = "দয়া করে সঠিক মান লিখুন।";
+        return;
+      }
+      const monthlyRate = (annualRate / 100) / 12;
+      const n = tenure * 12;
+      const emi = (principal * monthlyRate * Math.pow(1+monthlyRate, n)) / (Math.pow(1+monthlyRate, n) - 1);
+      const totalPayment = emi * n;
+      const totalInterest = totalPayment - principal;
+      resultDiv.innerHTML = `মাসিক EMI: ${emi.toFixed(2)} টাকা<br>মোট পরিশোধ: ${totalPayment.toFixed(2)} টাকা<br>মোট সুদ: ${totalInterest.toFixed(2)} টাকা`;
+    }
+    
+    /* ----------------- Tip Calculator ----------------- */
+    function calculateTip() {
+      const bill = parseFloat(document.getElementById('billAmount').value);
+      const percent = parseFloat(document.getElementById('tipPercent').value);
+      const persons = parseInt(document.getElementById('numPersons').value);
+      const resultDiv = document.getElementById('tipResult');
+      
+      if(isNaN(bill) || isNaN(percent) || bill<=0 || percent<0 || isNaN(persons) || persons<=0) {
+        resultDiv.innerHTML = "দয়া করে সঠিক মান লিখুন।";
+        return;
+      }
+      const totalTip = bill * percent / 100;
+      const totalBill = bill + totalTip;
+      const tipPerPerson = totalTip / persons;
+      const billPerPerson = totalBill / persons;
+      resultDiv.innerHTML = `মোট টিপ: ${totalTip.toFixed(2)} টাকা<br>মোট বিল: ${totalBill.toFixed(2)} টাকা<br>প্রতি জনের টিপ: ${tipPerPerson.toFixed(2)} টাকা<br>প্রতি জনের বিল: ${billPerPerson.toFixed(2)} টাকা`;
+    }
+    
+    /* ----------------- Length Converter ----------------- */
+    const lengthFactors = {
+      "km": 1000,
+      "m": 1,
+      "cm": 0.01,
+      "mile": 1609.34,
+      "yard": 0.9144
+    };
+    function convertLength() {
+      const value = parseFloat(document.getElementById('lengthValue').value);
+      const from = document.getElementById('lengthFrom').value;
+      const to = document.getElementById('lengthTo').value;
+      const resultDiv = document.getElementById('lengthResult');
+      
+      if(isNaN(value) || value < 0) {
+        resultDiv.innerHTML = "দয়া করে সঠিক মান লিখুন।";
+        return;
+      }
+      const valueInMeters = value * lengthFactors[from];
+      const converted = valueInMeters / lengthFactors[to];
+      resultDiv.innerHTML = `${value} ${from} = ${converted.toFixed(4)} ${to}`;
+    }
+    
+    /* ----------------- Dark Mode Toggle ----------------- */
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    darkModeToggle.addEventListener('change', function() {
+      document.body.classList.toggle('dark-mode', this.checked);
+    });
+    
+    /* ----------------- Back to Top ----------------- */
+    const backToTopButton = document.getElementById('backToTop');
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 300) {
+        backToTopButton.style.display = 'block';
+      } else {
+        backToTopButton.style.display = 'none';
+      }
+    });
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
